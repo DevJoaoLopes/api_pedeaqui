@@ -30,10 +30,10 @@ route.post('/', async (request, response) => {
         })
     }
 
-    let clientes = await mysql.queryAsync(`INSERT INTO clientes (nome, cpf, imagem_perfil, created_at) VALUES (?, ?, ?, ?)`, [nome, cpf, imagem_perfil, moment().format('YYYY-MM-DD HH:mm:ss')])
+    let cliente = await mysql.queryAsync(`INSERT INTO clientes (nome, cpf, imagem_perfil, created_at) VALUES (?, ?, ?, ?)`, [nome, cpf, imagem_perfil, moment().format('YYYY-MM-DD HH:mm:ss')])
     
     return response.status(200).json({
-        data: clientes.insertId
+        data: cliente.insertId
     })
 
 })

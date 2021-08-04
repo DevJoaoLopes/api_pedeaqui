@@ -45,6 +45,7 @@ const validationToken = (request, response, next) => {
  */
 const clientes = require('./app/routes/clientes')
 const autenticacao = require('./app/routes/autenticacao')
+const enderecos = require('./app/routes/enderecos')
 
 
 /**
@@ -58,6 +59,7 @@ app.get(`/`, (request, response) => {
 
 app.use(`/login`, autenticacao)
 app.use(`/clientes`, clientes)
+app.use(`/enderecos`, enderecos)
 
 
 /**
