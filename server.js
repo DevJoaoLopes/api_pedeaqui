@@ -46,6 +46,8 @@ const validationToken = (request, response, next) => {
 const clientes = require('./app/routes/clientes')
 const autenticacao = require('./app/routes/autenticacao')
 const enderecos = require('./app/routes/enderecos')
+const emails = require('./app/routes/emails')
+const estabelecimentos = require('./app/routes/estabelecimentos')
 
 
 /**
@@ -60,6 +62,8 @@ app.get(`/`, (request, response) => {
 app.use(`/login`, autenticacao)
 app.use(`/clientes`, clientes)
 app.use(`/enderecos`, enderecos)
+app.use(`/emails`, emails)
+app.use(`/estabelecimentos`, estabelecimentos)
 
 
 /**

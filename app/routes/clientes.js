@@ -8,6 +8,14 @@ const cpf_existe = async (cpf) => {
     return  cliente
 } 
 
+const cpf_tamanho = (cpf) => {
+    return cpf.length === 11 ? true : false
+} 
+
+const cpf_remover_texto = (cpf) => {
+    return cpf.replace(/\D/g, '')
+} 
+
 route.get('/', async (request, response) => {
 
     let clientes = await mysql.queryAsync(`SELECT c.* FROM clientes AS c WHERE deleted_at IS NULL`)
@@ -20,9 +28,19 @@ route.get('/', async (request, response) => {
 
 route.post('/', async (request, response) => {
 
-    const {nome, cpf, imagem_perfil} = request.body
+    let {nome, cpf, imagem_perfil} = request.body
 
-    const validacao_cpf = await cpf_existe(cpf)
+    cpf = cpf_remover_texto(cpf)
+
+    let validacao_cpf = cpf_tamanho(cpf)
+
+    if(!validacao_cpf){
+        return response.status(500).json({
+            data: `Tamanho do CPF está incorreto, verifique se há 14 caracteres sem contar caracteres especiais e letras`
+        })
+    }
+
+    validacao_cpf = await cpf_existe(cpf)
 
     if(validacao_cpf.length > 0){
         return response.status(500).json({
