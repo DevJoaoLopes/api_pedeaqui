@@ -4,7 +4,7 @@ const { mysql } = require("../helpers/mysql")
 const moment = require("moment")
 
 const cnpj_existe = async (cnpj) => {
-    let estabelecimento = await mysql.queryAsync(`SELECT c.* FROM estabelecimentos AS c WHERE c.cnpj = ?`, cnpj)
+    let estabelecimento = await mysql.queryAsync(`SELECT e.* FROM estabelecimentos AS e WHERE e.cnpj = ?`, cnpj)
     return  estabelecimento
 } 
 
@@ -18,7 +18,7 @@ const cnpj_remover_texto = (cnpj) => {
 
 route.get('/', async (request, response) => {
 
-    let estabelecimentos = await mysql.queryAsync(`SELECT c.* FROM estabelecimentos AS c WHERE deleted_at IS NULL`)
+    let estabelecimentos = await mysql.queryAsync(`SELECT e.* FROM estabelecimentos AS e WHERE deleted_at IS NULL`)
     
     return response.status(200).json({
         data: estabelecimentos

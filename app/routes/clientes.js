@@ -18,7 +18,7 @@ const cpf_remover_texto = (cpf) => {
 
 route.get('/', async (request, response) => {
 
-    let clientes = await mysql.queryAsync(`SELECT c.* FROM clientes AS c WHERE deleted_at IS NULL`)
+    let clientes = await mysql.queryAsync(`SELECT c.* FROM clientes AS c WHERE c.deleted_at IS NULL`)
     
     return response.status(200).json({
         data: clientes

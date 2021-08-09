@@ -15,7 +15,7 @@ route.post('/', async (request, response) => {
         LEFT JOIN estabelecimentos_has_emails AS ee ON ee.id = u.estabelecimento_email_id
         LEFT JOIN clientes_has_emails AS ce ON ce.id = u.cliente_email_id
         LEFT JOIN emails AS em ON em.id = ee.email_id OR em.id = ce.email_id
-        WHERE (em.email = ? OR u.usuario = ?) AND senha = ?`, [acesso, acesso, senha]
+        WHERE (em.email = ? OR u.usuario = ?) AND senha = ? AND em.deleted_at IS NULL`, [acesso, acesso, senha]
     )
     
     if(usuario.length > 0){
