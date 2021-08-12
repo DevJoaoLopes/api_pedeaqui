@@ -48,6 +48,11 @@ const autenticacao = require('./app/routes/autenticacao')
 const enderecos = require('./app/routes/enderecos')
 const emails = require('./app/routes/emails')
 const estabelecimentos = require('./app/routes/estabelecimentos')
+const tipos_telefone = require('./app/routes/tipos_telefone')
+const tipos_conta = require('./app/routes/tipos_conta')
+const tipos_cartao = require('./app/routes/tipos_cartao')
+const categorias = require('./app/routes/categorias')
+const categorias_estabelecimentos = require('./app/routes/categorias_estabelecimentos')
 
 
 /**
@@ -64,6 +69,11 @@ app.use(`/clientes`, clientes)
 app.use(`/enderecos`, enderecos)
 app.use(`/emails`, emails)
 app.use(`/estabelecimentos`, estabelecimentos)
+app.use(`/tipos/telefone`, tipos_telefone)
+app.use(`/tipos/conta`, tipos_conta)
+app.use(`/tipos/cartao`, tipos_cartao)
+app.use(`/categorias/cardapio`, categorias)
+app.use(`/categorias/estabelecimentos`, categorias_estabelecimentos)
 
 
 /**
