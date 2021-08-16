@@ -53,6 +53,7 @@ const tipos_conta = require('./app/routes/tipos_conta')
 const tipos_cartao = require('./app/routes/tipos_cartao')
 const categorias = require('./app/routes/categorias')
 const categorias_estabelecimentos = require('./app/routes/categorias_estabelecimentos')
+const categorias_has_estabelecimentos = require('./app/routes/categorias_has_estabelecimentos')
 
 
 /**
@@ -74,6 +75,7 @@ app.use(`/tipos/conta`, tipos_conta)
 app.use(`/tipos/cartao`, tipos_cartao)
 app.use(`/categorias/cardapio`, categorias)
 app.use(`/categorias/estabelecimentos`, categorias_estabelecimentos)
+app.use(`/categorias/categorias_has_estabelecimentos`, categorias_has_estabelecimentos)
 
 
 /**
