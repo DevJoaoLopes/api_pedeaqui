@@ -43,17 +43,21 @@ const validationToken = (request, response, next) => {
 /**
  * @description Arquivos
  */
-const clientes = require('./app/routes/clientes')
+const aplicacoes = require('./app/routes/aplicacoes')
 const autenticacao = require('./app/routes/autenticacao')
-const enderecos = require('./app/routes/enderecos')
-const emails = require('./app/routes/emails')
-const estabelecimentos = require('./app/routes/estabelecimentos')
-const tipos_telefone = require('./app/routes/tipos_telefone')
-const tipos_conta = require('./app/routes/tipos_conta')
-const tipos_cartao = require('./app/routes/tipos_cartao')
 const categorias = require('./app/routes/categorias')
 const categorias_estabelecimentos = require('./app/routes/categorias_estabelecimentos')
 const categorias_has_estabelecimentos = require('./app/routes/categorias_has_estabelecimentos')
+const chaves_pix = require('./app/routes/chaves_pix')
+const clientes = require('./app/routes/clientes')
+const emails = require('./app/routes/emails')
+const enderecos = require('./app/routes/enderecos')
+const estabelecimentos = require('./app/routes/estabelecimentos')
+const formas_pagamento = require('./app/routes/formas_pagamento')
+const setores = require('./app/routes/setores')
+const tipos_cartao = require('./app/routes/tipos_cartao')
+const tipos_conta = require('./app/routes/tipos_conta')
+const tipos_telefone = require('./app/routes/tipos_telefone')
 
 
 /**
@@ -65,17 +69,21 @@ app.get(`/`, (request, response) => {
     })
 })
 
-app.use(`/login`, autenticacao)
-app.use(`/clientes`, clientes)
-app.use(`/enderecos`, enderecos)
-app.use(`/emails`, emails)
-app.use(`/estabelecimentos`, estabelecimentos)
-app.use(`/tipos/telefone`, tipos_telefone)
-app.use(`/tipos/conta`, tipos_conta)
-app.use(`/tipos/cartao`, tipos_cartao)
+app.use(`/aplicacoes`, aplicacoes)
 app.use(`/categorias/cardapio`, categorias)
-app.use(`/categorias/estabelecimentos`, categorias_estabelecimentos)
 app.use(`/categorias/categorias_has_estabelecimentos`, categorias_has_estabelecimentos)
+app.use(`/categorias/estabelecimentos`, categorias_estabelecimentos)
+app.use(`/chaves_pix`, chaves_pix)
+app.use(`/clientes`, clientes)
+app.use(`/emails`, emails)
+app.use(`/enderecos`, enderecos)
+app.use(`/estabelecimentos`, estabelecimentos)
+app.use(`/formas_pagamento`, formas_pagamento)
+app.use(`/login`, autenticacao)
+app.use(`/setores`, setores)
+app.use(`/tipos/cartao`, tipos_cartao)
+app.use(`/tipos/conta`, tipos_conta)
+app.use(`/tipos/telefone`, tipos_telefone)
 
 
 /**
