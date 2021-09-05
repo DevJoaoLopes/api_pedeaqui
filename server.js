@@ -43,6 +43,7 @@ const validationToken = (request, response, next) => {
 /**
  * @description Arquivos
  */
+const aplicacoes_has_formas_pagamento = require('./app/routes/aplicacoes_has_formas_pagamento')
 const aplicacoes = require('./app/routes/aplicacoes')
 const autenticacao = require('./app/routes/autenticacao')
 const categorias = require('./app/routes/categorias')
@@ -64,6 +65,7 @@ const estabelecimentos_has_planos = require('./app/routes/estabelecimentos_has_p
 const estabelecimentos_has_telefones = require('./app/routes/estabelecimentos_has_telefones')
 const estabelecimentos = require('./app/routes/estabelecimentos')
 const formas_pagamento = require('./app/routes/formas_pagamento')
+const itens_cardapios = require('./app/routes/itens_cardapios')
 const mesas = require('./app/routes/mesas')
 const opcoes_pagamento = require('./app/routes/opcoes_pagamento')
 const permissoes = require('./app/routes/permissoes')
@@ -85,6 +87,7 @@ app.get(`/`, (request, response) => {
     })
 })
 
+app.use(`/aplicacoes_has/formas_pagamento`, aplicacoes_has_formas_pagamento)
 app.use(`/aplicacoes`, aplicacoes)
 app.use(`/categorias/cardapio`, categorias)
 app.use(`/categorias/categorias_has_estabelecimentos`, categorias_has_estabelecimentos)
@@ -105,6 +108,7 @@ app.use(`/estabelecimentos_has/planos`, estabelecimentos_has_planos)
 app.use(`/estabelecimentos_has/telefones`, estabelecimentos_has_telefones)
 app.use(`/estabelecimentos`, estabelecimentos)
 app.use(`/formas_pagamento`, formas_pagamento)
+app.use(`/itens/cardapios`, itens_cardapios)
 app.use(`/login`, autenticacao)
 app.use(`/mesas`, mesas)
 app.use(`/opcoes_pagamento`, opcoes_pagamento)
