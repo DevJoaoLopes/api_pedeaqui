@@ -43,6 +43,8 @@ const validationToken = (request, response, next) => {
 /**
  * @description Arquivos
  */
+const acompanhamentos_has_itens_cardapios = require('./app/routes/acompanhamentos_has_itens_cardapios')
+const acompanhamentos = require('./app/routes/acompanhamentos')
 const aplicacoes_has_formas_pagamento = require('./app/routes/aplicacoes_has_formas_pagamento')
 const aplicacoes = require('./app/routes/aplicacoes')
 const autenticacao = require('./app/routes/autenticacao')
@@ -87,6 +89,8 @@ app.get(`/`, (request, response) => {
     })
 })
 
+app.use(`/acompanhamentos_has/itens_cardapios`, acompanhamentos_has_itens_cardapios)
+app.use(`/acompanhamentos`, acompanhamentos)
 app.use(`/aplicacoes_has/formas_pagamento`, aplicacoes_has_formas_pagamento)
 app.use(`/aplicacoes`, aplicacoes)
 app.use(`/categorias/cardapio`, categorias)

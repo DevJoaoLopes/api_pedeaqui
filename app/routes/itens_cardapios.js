@@ -15,9 +15,9 @@ route.get('/', async (request, response) => {
 
 route.post('/', async (request, response) => {
 
-    const {categoria_id, estabelecimento_id, preparado_por_id, item, valor, quantidade, descricao} = request.body
+    const {categoria_id, estabelecimento_id, preparado_por_id, item, valor, quantidade, serve, descricao} = request.body
 
-    let registro = await mysql.queryAsync(`INSERT INTO itens_cardapios (categoria_id, estabelecimento_id, preparado_por_id, item, valor, quantidade, descricao, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [categoria_id, estabelecimento_id, preparado_por_id, item, valor, quantidade, descricao, moment().format('YYYY-MM-DD HH:mm:ss')])
+    let registro = await mysql.queryAsync(`INSERT INTO itens_cardapios (categoria_id, estabelecimento_id, preparado_por_id, item, valor, quantidade, serve, descricao, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, [categoria_id, estabelecimento_id, preparado_por_id, item, valor, quantidade, serve, descricao, moment().format('YYYY-MM-DD HH:mm:ss')])
     
     return response.status(200).json({
         data: registro.insertId
@@ -27,9 +27,9 @@ route.post('/', async (request, response) => {
 
 route.put('/:id', async (request, response) => {
 
-    const {categoria_id, estabelecimento_id, preparado_por_id, item, valor, quantidade, descricao} = request.body
+    const {categoria_id, estabelecimento_id, preparado_por_id, item, valor, quantidade, serve, descricao} = request.body
 
-    await mysql.queryAsync(`UPDATE itens_cardapios SET categoria_id = ?, estabelecimento_id = ?, preparado_por_id = ?, item = ?, valor = ?, quantidade = ?, descricao = ?, updated_at = ? WHERE id = ?`, [categoria_id, estabelecimento_id, preparado_por_id, item, valor, quantidade, descricao, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
+    await mysql.queryAsync(`UPDATE itens_cardapios SET categoria_id = ?, estabelecimento_id = ?, preparado_por_id = ?, item = ?, valor = ?, quantidade = ?, serve = ?, descricao = ?, updated_at = ? WHERE id = ?`, [categoria_id, estabelecimento_id, preparado_por_id, item, valor, quantidade, serve, descricao, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
     
     return response.status(200).json({
         data: parseInt(request.params.id)
