@@ -14,15 +14,33 @@ app.use(function(request, response, next) {
 })
 
 app.use(cors())
-app.use(express.json())
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb', extended: true}));
 
 app.set('port', process.env.API_PORT || 3131)
+
+const validationRoute = (request) => {
+    var rotas = routes_without_token.filter(r => r.route.indexOf('/*') > -1)
+    var rota_acessada = rotas.find((r, i) => {
+        var split_request = request.originalUrl.split('/')
+        var split_rotas = r.route.split('/')
+        var index_all = split_rotas.indexOf('*')
+        return request.originalUrl.indexOf(r.route.replace('/*', '')) > -1 && split_rotas[index_all - 1] == split_request[index_all - 1]
+    })
+
+    if(!rota_acessada){
+        return !routes_without_token.find((r) => { return r.route === request.originalUrl && r.method === request.method })
+    }
+    else{
+        return false 
+    }
+}
 
 const validationToken = (request, response, next) => {
 
     var token = request.headers['authorization']
 
-    if(!routes_without_token.find((r) => { return r.route === request.originalUrl && r.method === request.method })){
+    if(validationRoute(request)){
         if(!token){
             response.statusCode = 401
             return response.json({data: 'Token inexistente'}) 
@@ -69,6 +87,7 @@ const estabelecimentos_has_planos = require('./app/routes/estabelecimentos_has_p
 const estabelecimentos_has_telefones = require('./app/routes/estabelecimentos_has_telefones')
 const estabelecimentos = require('./app/routes/estabelecimentos')
 const formas_pagamento = require('./app/routes/formas_pagamento')
+const imagens_itens_cardapios = require('./app/routes/imagens_itens_cardapios')
 const itens_cardapios = require('./app/routes/itens_cardapios')
 const mesas = require('./app/routes/mesas')
 const opcoes_pagamento = require('./app/routes/opcoes_pagamento')
@@ -91,6 +110,8 @@ app.get(`/`, (request, response) => {
         data: 'Bem vindo a API da aplicação PedeAqui.'
     })
 })
+
+app.use('/imagens', express.static(__dirname + '/app/images'));
 
 app.use(`/acompanhamentos_has/itens_cardapios`, acompanhamentos_has_itens_cardapios)
 app.use(`/acompanhamentos`, acompanhamentos)
@@ -117,6 +138,7 @@ app.use(`/estabelecimentos_has/planos`, estabelecimentos_has_planos)
 app.use(`/estabelecimentos_has/telefones`, estabelecimentos_has_telefones)
 app.use(`/estabelecimentos`, estabelecimentos)
 app.use(`/formas_pagamento`, formas_pagamento)
+app.use(`/itens/cardapios/imagens`, imagens_itens_cardapios)
 app.use(`/itens/cardapios`, itens_cardapios)
 app.use(`/login`, autenticacao)
 app.use(`/mesas`, mesas)

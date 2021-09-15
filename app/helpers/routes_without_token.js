@@ -3,4 +3,5 @@ module.exports = [
     { route: '/clientes', method: 'POST' },
     { route: '/estabelecimentos', method: 'POST' },
     { route: '/login', method: 'POST' },
+    { route: '/imagens/*', method: 'GET' },
 ]
