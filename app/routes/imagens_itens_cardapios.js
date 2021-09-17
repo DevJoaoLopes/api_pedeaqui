@@ -10,6 +10,7 @@ const {
 } = require("crypto")
 
 const salvar_imagem = async (item_cardapio_id, nome_imagem, extensao_imagem, imagem) => {
+    
     let item_cardapio = await mysql.queryAsync(`SELECT i.* FROM itens_cardapios AS i WHERE i.id = ?`, [item_cardapio_id])
     let criptografia_nome = `${createHmac('sha256', process.env.SECRET_FILE).update(nome_imagem).digest('hex')}.${extensao_imagem.replace(/[^a-zA-Z]+/g, '')}`
 
@@ -49,10 +50,35 @@ route.post('/', async (request, response) => {
     let pasta = await salvar_imagem(item_cardapio_id, nome_imagem, extensao_imagem, imagem)
     
     if(pasta){
-        let registro = await mysql.queryAsync(`INSERT INTO imagens_itens_cardapios (item_cardapio_id, imagem, created_at) VALUES (?, ?, ?)`, [item_cardapio_id, pasta, moment().format('YYYY-MM-DD HH:mm:ss')])
+        let registro = await mysql.queryAsync(`INSERT INTO imagens_itens_cardapios (item_cardapio_id, nome_imagem, extensao_imagem, imagem, created_at) VALUES (?, ?, ?, ?, ?)`, [item_cardapio_id, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss')])
         
         return response.status(200).json({
             data: registro.insertId
+        })
+    }
+    else{
+        return response.status(500).json({
+            data: "Erro ao salvar imagem"
+        })
+    }
+
+})
+
+route.put('/:id', async (request, response) => {
+
+    const {item_cardapio_id, nome_imagem, extensao_imagem, imagem} = request.body
+
+    let pasta = imagem
+
+    if(imagem.indexOf('imagens/cardapios') == -1){
+        pasta = await salvar_imagem(item_cardapio_id, nome_imagem, extensao_imagem, imagem)
+    }
+    
+    if(pasta){
+        await mysql.queryAsync(`UPDATE imagens_itens_cardapios SET item_cardapio_id = ?, nome_imagem = ?, extensao_imagem = ?, imagem = ?, updated_at = ? WHERE id = ?`, [item_cardapio_id, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
+        
+        return response.status(200).json({
+            data: parseInt(request.params.id)
         })
     }
     else{
