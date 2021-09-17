@@ -50,7 +50,7 @@ route.post('/', async (request, response) => {
     let pasta = imagem ? await salvar_imagem(nome_imagem, extensao_imagem, imagem) : null
 
     if(pasta !== false){
-        let categoria_estabelecimentos = await mysql.queryAsync(`INSERT INTO categorias_estabelecimentos (categoria, nome_imagem, extensao_imagem, imagem, created_at) VALUES (?, ?, ?, ?, ?)`, [categoria, nome_imagem, extensao_imagem, imagem, moment().format('YYYY-MM-DD HH:mm:ss')])
+        let categoria_estabelecimentos = await mysql.queryAsync(`INSERT INTO categorias_estabelecimentos (categoria, nome_imagem, extensao_imagem, imagem, created_at) VALUES (?, ?, ?, ?, ?)`, [categoria, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss')])
         
         return response.status(200).json({
             data: categoria_estabelecimentos.insertId
