@@ -51,18 +51,17 @@ route.post('/', async (request, response) => {
 
     let pasta = imagem ? await salvar_imagem(nome_imagem, extensao_imagem, imagem) : null
 
-    if(pasta !== false){
-        let registro = await mysql.queryAsync(`INSERT INTO categorias (categoria, nome_imagem, extensao_imagem, imagem, created_at) VALUES (?, ?, ?, ?, ?)`, [categoria, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss')])
-        
-        return response.status(200).json({
-            data: registro.insertId
-        })
-    }
-    else{
+    if(pasta === false){
         return response.status(500).json({
             data: "Erro ao salvar imagem"
         })
     }
+
+    let registro = await mysql.queryAsync(`INSERT INTO categorias (categoria, nome_imagem, extensao_imagem, imagem, created_at) VALUES (?, ?, ?, ?, ?)`, [categoria, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss')])
+    
+    return response.status(200).json({
+        data: registro.insertId
+    })
 
 })
 
@@ -78,18 +77,17 @@ route.put('/:id', async (request, response) => {
         pasta = imagem ? await salvar_imagem(nome_imagem, extensao_imagem, imagem) : null
     }
     
-    if(pasta !== false){
-        await mysql.queryAsync(`UPDATE categorias SET categoria = ?, nome_imagem = ?, extensao_imagem = ?, imagem = ?, updated_at = ? WHERE id = ?`, [categoria, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
-        
-        return response.status(200).json({
-            data: parseInt(request.params.id)
-        })
-    }
-    else{
+    if(pasta === false){
         return response.status(500).json({
             data: "Erro ao salvar imagem"
         })
     }
+
+    await mysql.queryAsync(`UPDATE categorias SET categoria = ?, nome_imagem = ?, extensao_imagem = ?, imagem = ?, updated_at = ? WHERE id = ?`, [categoria, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
+    
+    return response.status(200).json({
+        data: parseInt(request.params.id)
+    })
 
 })
 

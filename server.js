@@ -4,8 +4,9 @@ const cors = require('cors')
 require("dotenv/config")
 const jwt = require('jsonwebtoken')
 const routes_without_token = require('./app/helpers/routes_without_token')
+const validation_user = require('./app/helpers/validation_user')
 
-app.use(function(request, response, next) {
+app.use((request, response, next) => {
     response.header('Access-Control-Allow-Origin', '*')
     response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
     response.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
@@ -45,16 +46,26 @@ const validationToken = (request, response, next) => {
             response.statusCode = 401
             return response.json({data: 'Token inexistente'}) 
         }
-        jwt.verify(token, process.env.SECRET, (erro, decodificar) => {
+        jwt.verify(token, process.env.SECRET, async (erro, decodificar) => {
             if(erro){
                 response.statusCode = 401
                 return response.json({data: 'Token inválido'}) 
             } 
+
+            if(!(await validation_user.validation(decodificar))){
+                response.statusCode = 401
+                return response.json({data: 'Usuário desativado'}) 
+            }
+            
             request.user = decodificar
+
+            next()
         })
     }
-    
-    next()
+    else{
+        next()
+    }
+
     
 }
 
@@ -101,6 +112,7 @@ const telefones = require('./app/routes/telefones')
 const tipos_cartao = require('./app/routes/tipos_cartao')
 const tipos_conta = require('./app/routes/tipos_conta')
 const tipos_telefone = require('./app/routes/tipos_telefone')
+const usuarios = require('./app/routes/usuarios')
 
 
 /**
@@ -154,6 +166,7 @@ app.use(`/telefones`, telefones)
 app.use(`/tipos/cartao`, tipos_cartao)
 app.use(`/tipos/conta`, tipos_conta)
 app.use(`/tipos/telefone`, tipos_telefone)
+app.use(`/usuarios`, usuarios)
 
 
 /**

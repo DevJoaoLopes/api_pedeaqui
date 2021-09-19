@@ -49,19 +49,18 @@ route.post('/', async (request, response) => {
 
     let pasta = await salvar_imagem(item_cardapio_id, nome_imagem, extensao_imagem, imagem)
     
-    if(pasta){
-        let registro = await mysql.queryAsync(`INSERT INTO imagens_itens_cardapios (item_cardapio_id, nome_imagem, extensao_imagem, imagem, created_at) VALUES (?, ?, ?, ?, ?)`, [item_cardapio_id, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss')])
-        
-        return response.status(200).json({
-            data: registro.insertId
-        })
-    }
-    else{
+    if(!pasta){
         return response.status(500).json({
             data: "Erro ao salvar imagem"
         })
     }
 
+    let registro = await mysql.queryAsync(`INSERT INTO imagens_itens_cardapios (item_cardapio_id, nome_imagem, extensao_imagem, imagem, created_at) VALUES (?, ?, ?, ?, ?)`, [item_cardapio_id, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss')])
+    
+    return response.status(200).json({
+        data: registro.insertId
+    })
+    
 })
 
 route.put('/:id', async (request, response) => {
@@ -74,18 +73,17 @@ route.put('/:id', async (request, response) => {
         pasta = await salvar_imagem(item_cardapio_id, nome_imagem, extensao_imagem, imagem)
     }
     
-    if(pasta){
-        await mysql.queryAsync(`UPDATE imagens_itens_cardapios SET item_cardapio_id = ?, nome_imagem = ?, extensao_imagem = ?, imagem = ?, updated_at = ? WHERE id = ?`, [item_cardapio_id, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
-        
-        return response.status(200).json({
-            data: parseInt(request.params.id)
-        })
-    }
-    else{
+    if(!pasta){
         return response.status(500).json({
             data: "Erro ao salvar imagem"
         })
     }
+    
+    await mysql.queryAsync(`UPDATE imagens_itens_cardapios SET item_cardapio_id = ?, nome_imagem = ?, extensao_imagem = ?, imagem = ?, updated_at = ? WHERE id = ?`, [item_cardapio_id, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
+    
+    return response.status(200).json({
+        data: parseInt(request.params.id)
+    })
 
 })
 
