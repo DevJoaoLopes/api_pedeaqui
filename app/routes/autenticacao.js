@@ -23,7 +23,7 @@ route.post('/', async (request, response) => {
         let permissoes = await mysql.queryAsync(`
             SELECT p.permissao FROM usuarios_has_permissoes AS up
             INNER JOIN permissoes AS p ON p.id = up.permissao_id
-            WHERE up.usuario_id = ? AND p.deleted_at IS NULL`, [usuario[0].id]
+            WHERE up.usuario_id = ? AND p.deleted_at IS NULL AND up.deleted_at IS NULL`, [usuario[0].id]
         )
 
         return response.status(200).json({

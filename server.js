@@ -112,6 +112,7 @@ const telefones = require('./app/routes/telefones')
 const tipos_cartao = require('./app/routes/tipos_cartao')
 const tipos_conta = require('./app/routes/tipos_conta')
 const tipos_telefone = require('./app/routes/tipos_telefone')
+const usuarios_has_permissoes = require('./app/routes/usuarios_has_permissoes')
 const usuarios = require('./app/routes/usuarios')
 
 
@@ -166,6 +167,7 @@ app.use(`/telefones`, telefones)
 app.use(`/tipos/cartao`, tipos_cartao)
 app.use(`/tipos/conta`, tipos_conta)
 app.use(`/tipos/telefone`, tipos_telefone)
+app.use(`/usuarios/permissoes`, usuarios_has_permissoes)
 app.use(`/usuarios`, usuarios)
 
 
