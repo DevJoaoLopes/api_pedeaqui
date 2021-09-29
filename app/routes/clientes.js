@@ -36,7 +36,7 @@ route.post('/', async (request, response) => {
 
     if(!validacao_cpf){
         return response.status(500).json({
-            data: `Tamanho do CPF está incorreto, verifique se há 14 caracteres sem contar caracteres especiais e letras`
+            data: `Tamanho do CPF está incorreto, verifique se há 11 caracteres sem contar caracteres especiais e letras`
         })
     }
 
