@@ -15,7 +15,7 @@ route.post('/', async (request, response) => {
         LEFT JOIN estabelecimentos_has_emails AS ee ON ee.id = u.estabelecimento_email_id
         LEFT JOIN clientes_has_emails AS ce ON ce.id = u.cliente_email_id
         LEFT JOIN emails AS em ON em.id = ee.email_id OR em.id = ce.email_id
-        WHERE (em.email = ? OR u.usuario = ?) AND senha = ?`, [acesso, acesso, senha]
+        WHERE (em.email = ? OR u.usuario = ?) AND senha = ? AND em.deleted_at IS NULL AND u.deleted_at IS NULL`, [acesso, acesso, senha]
     )
     
     if(usuario.length > 0){
@@ -23,7 +23,7 @@ route.post('/', async (request, response) => {
         let permissoes = await mysql.queryAsync(`
             SELECT p.permissao FROM usuarios_has_permissoes AS up
             INNER JOIN permissoes AS p ON p.id = up.permissao_id
-            WHERE up.usuario_id = ?`, [usuario[0].id]
+            WHERE up.usuario_id = ? AND p.deleted_at IS NULL AND up.deleted_at IS NULL`, [usuario[0].id]
         )
 
         return response.status(200).json({
@@ -33,7 +33,7 @@ route.post('/', async (request, response) => {
     }
 
     return response.status(404).json({
-        data: `Falha ao realizar login, verifique os dados de acesso`
+        data: `Falha ao realizar login, verifique os dados de acesso ou o usuário foi desativado`
     })
 
 })
