@@ -21,6 +21,8 @@ app.use(express.urlencoded({limit: '50mb', extended: true}));
 app.set('port', process.env.API_PORT || 3131)
 
 const validationRoute = (request) => {
+    if(request.method === 'OPTIONS') return false
+    
     var rotas = routes_without_token.filter(r => r.route.indexOf('/*') > -1)
     var rota_acessada = rotas.find((r, i) => {
         var split_request = request.originalUrl.split('/')
