@@ -40,9 +40,27 @@ route.post('/identificar', async (request, response) => {
     const {codigo} = request.body
 
     let mesa = await mysql.queryAsync(`SELECT m.* FROM mesas AS m WHERE m.codigo = ? AND m.deleted_at IS NULL`, [codigo])
+
+    let pedido = await mysql.queryAsync(`SELECT p.* FROM pedidos AS p WHERE p.mesa_id = ? AND p.encerrado IS NULL`, [mesa.length > 0 ? mesa[0].id : 0])
+    
+    let pedido_has_usuarios = []
+    
+    if(pedido.length > 0){
+        pedido_has_usuarios = await mysql.queryAsync(`
+            SELECT pu.*, e.razao_social, c.nome FROM pedidos_has_usuarios AS pu 
+            INNER JOIN usuarios AS u ON u.id = pu.usuario_id
+            LEFT JOIN estabelecimentos AS e ON e.id = u.estabelecimento_id
+            LEFT JOIN clientes AS c ON c.id = u.cliente_id
+            WHERE pu.pedido_id = ?
+        `, [pedido[0].id])
+    }
     
     return response.status(200).json({
-        data: mesa
+        data: {
+            mesa: mesa,
+            pedido: pedido,
+            usuarios: pedido_has_usuarios
+        }
     })
 
 })
