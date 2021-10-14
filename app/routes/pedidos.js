@@ -19,7 +19,7 @@ route.post('/', async (request, response) => {
 
     let registro = await mysql.queryAsync(`INSERT INTO pedidos (mesa_id, estabelecimento_compartilhado_id, criado) VALUES (?, ?, ?)`, [mesa_id, estabelecimento_compartilhado_id, moment().format('YYYY-MM-DD HH:mm:ss')])
     
-    await mysql.queryAsync(`INSERT INTO pedidos_has_usuarios (pedido_id, usuario_id, admin, chegada) VALUES (?, ?, ?, ?)`, [registro.insertId, request.user, 1, moment().format('YYYY-MM-DD HH:mm:ss')])
+    await mysql.queryAsync(`INSERT INTO pedidos_has_usuarios (pedido_id, usuario_id, admin, chegada, permitido) VALUES (?, ?, ?, ?, ?)`, [registro.insertId, request.user, 1, moment().format('YYYY-MM-DD HH:mm:ss'), 1])
 
     return response.status(200).json({
         data: registro.insertId
