@@ -47,9 +47,8 @@ route.post('/identificar', async (request, response) => {
     
     if(pedido.length > 0){
         pedido_has_usuarios = await mysql.queryAsync(`
-            SELECT pu.*, e.razao_social, c.nome FROM pedidos_has_usuarios AS pu 
+            SELECT pu.*, c.nome FROM pedidos_has_usuarios AS pu 
             INNER JOIN usuarios AS u ON u.id = pu.usuario_id
-            LEFT JOIN estabelecimentos AS e ON e.id = u.estabelecimento_id
             LEFT JOIN clientes AS c ON c.id = u.cliente_id
             WHERE pu.pedido_id = ?
         `, [pedido[0].id])

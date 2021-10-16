@@ -13,6 +13,21 @@ route.get('/', async (request, response) => {
 
 })
 
+route.get('/:pedido_id', async (request, response) => {
+
+    let pedidos_has_usuarios = await mysql.queryAsync(`
+        SELECT pu.*, c.nome FROM pedidos_has_usuarios AS pu
+        INNER JOIN usuarios AS u ON u.id = pu.usuario_id
+        LEFT JOIN clientes AS c ON c.id = u.cliente_id
+        WHERE pu.pedido_id = ?
+    `, [request.params.pedido_id])
+    
+    return response.status(200).json({
+        data: pedidos_has_usuarios
+    })
+
+})
+
 route.post('/', async (request, response) => {
 
     const {pedido_id, usuario_id, admin, permitido} = request.body
