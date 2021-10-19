@@ -59,7 +59,7 @@ route.post('/', async (request, response) => {
 
     let registro = await mysql.queryAsync(`INSERT INTO categorias (categoria, nome_imagem, extensao_imagem, imagem, created_at) VALUES (?, ?, ?, ?, ?)`, [categoria, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss')])
     
-    return response.status(200).json({
+    return response.status(201).json({
         data: registro.insertId
     })
 
@@ -95,7 +95,7 @@ route.delete('/:id', async (request, response) => {
 
     await mysql.queryAsync(`UPDATE categorias SET deleted_at = ? WHERE id = ?`, [moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
     
-    return response.status(200).json({
+    return response.status(204).json({
         data: parseInt(request.params.id)
     })
 })

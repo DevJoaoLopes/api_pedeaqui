@@ -43,7 +43,7 @@ route.post('/', async (request, response) => {
 
     let categorias_has_estabelecimentos = await mysql.queryAsync(`INSERT INTO categorias_has_estabelecimentos (estabelecimento_id, categoria_id) VALUES (?, ?)`, [estabelecimento_id, categoria_id])
     
-    return response.status(200).json({
+    return response.status(201).json({
         data: categorias_has_estabelecimentos.insertId
     })
 
@@ -53,7 +53,7 @@ route.delete('/:id', async (request, response) => {
 
     await mysql.queryAsync(`DELETE FROM categorias_has_estabelecimentos WHERE id = ?`, [request.params.id])
     
-    return response.status(200).json({
+    return response.status(204).json({
         data: parseInt(request.params.id)
     })
 })

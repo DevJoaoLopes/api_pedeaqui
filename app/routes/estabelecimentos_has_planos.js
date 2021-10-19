@@ -24,7 +24,7 @@ route.post('/', async (request, response) => {
 
     let registro = await mysql.queryAsync(`INSERT INTO estabelecimentos_has_planos (estabelecimento_id, plano_id, ativo) VALUES (?, ?, ?)`, [estabelecimento_id, plano_id, 1])
     
-    return response.status(200).json({
+    return response.status(201).json({
         data: registro.insertId
     })
 
@@ -36,7 +36,7 @@ route.put('/:id', async (request, response) => {
 
     await mysql.queryAsync(`UPDATE estabelecimentos_has_planos SET estabelecimento_id = ?, plano_id = ?, ativo = ? WHERE id = ?`, [estabelecimento_id, plano_id, ativo, request.params.id])
     
-    return response.status(200).json({
+    return response.status(204).json({
         data: parseInt(request.params.id)
     })
 

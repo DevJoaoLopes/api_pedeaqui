@@ -19,7 +19,7 @@ route.post('/', async (request, response) => {
 
     let endereco = await mysql.queryAsync(`INSERT INTO enderecos (cep, logradouro, numero, bairro, cidade, uf, complemento, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [cep, logradouro, numero, bairro, cidade, uf, complemento, moment().format('YYYY-MM-DD HH:mm:ss')])
     
-    return response.status(200).json({
+    return response.status(201).json({
         data: endereco.insertId
     })
 
@@ -41,7 +41,7 @@ route.delete('/:id', async (request, response) => {
 
     await mysql.queryAsync(`UPDATE enderecos SET deleted_at = ? WHERE id = ?`, [moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
     
-    return response.status(200).json({
+    return response.status(204).json({
         data: parseInt(request.params.id)
     })
 
