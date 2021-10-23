@@ -26,6 +26,16 @@ route.get('/', async (request, response) => {
 
 })
 
+route.get('/:id', async (request, response) => {
+
+    let estabelecimento = await mysql.queryAsync(`SELECT e.* FROM estabelecimentos AS e WHERE deleted_at IS NULL AND e.id = ?`, [request.params.id])
+    
+    return response.status(200).json({
+        data: estabelecimento
+    })
+
+})
+
 route.post('/', async (request, response) => {
 
     let {razao_social, nome_fantasia, cnpj, logo, descricao} = request.body

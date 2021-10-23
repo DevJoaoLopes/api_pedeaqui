@@ -13,6 +13,22 @@ route.get('/', async (request, response) => {
 
 })
 
+route.get('/:estabelecimento_id', async (request, response) => {
+
+    let itens_cardapios = await mysql.queryAsync(`SELECT i.* FROM itens_cardapios AS i WHERE i.deleted_at IS NULL AND i.estabelecimento_id = ?`, [request.params.estabelecimento_id])
+    let imagens_itens_cardapios = await mysql.queryAsync(`SELECT i.* FROM imagens_itens_cardapios AS i WHERE i.deleted_at IS NULL`)
+
+    itens_cardapios.map((i) => {
+        i.imagens = imagens_itens_cardapios.filter(imagem => imagem.item_cardapio_id === i.id)
+        return null
+    })
+    
+    return response.status(200).json({
+        data: itens_cardapios
+    })
+
+})
+
 route.post('/', async (request, response) => {
 
     const {categoria_id, estabelecimento_id, preparado_por_id, item, valor, quantidade, serve, descricao} = request.body
