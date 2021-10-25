@@ -45,7 +45,7 @@ route.get('/', async (request, response) => {
 
 route.post('/', async (request, response) => {
 
-    const {item_cardapio_id, nome_imagem, extensao_imagem, imagem} = request.body
+    const {item_cardapio_id, nome_imagem, extensao_imagem, imagem, principal} = request.body
 
     let pasta = await salvar_imagem(item_cardapio_id, nome_imagem, extensao_imagem, imagem)
     
@@ -55,7 +55,7 @@ route.post('/', async (request, response) => {
         })
     }
 
-    let registro = await mysql.queryAsync(`INSERT INTO imagens_itens_cardapios (item_cardapio_id, nome_imagem, extensao_imagem, imagem, created_at) VALUES (?, ?, ?, ?, ?)`, [item_cardapio_id, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss')])
+    let registro = await mysql.queryAsync(`INSERT INTO imagens_itens_cardapios (item_cardapio_id, nome_imagem, extensao_imagem, imagem, principal, created_at) VALUES (?, ?, ?, ?, ?, ?)`, [item_cardapio_id, nome_imagem, extensao_imagem, pasta, principal, moment().format('YYYY-MM-DD HH:mm:ss')])
     
     return response.status(201).json({
         data: registro.insertId
@@ -65,7 +65,7 @@ route.post('/', async (request, response) => {
 
 route.put('/:id', async (request, response) => {
 
-    const {item_cardapio_id, nome_imagem, extensao_imagem, imagem} = request.body
+    const {item_cardapio_id, nome_imagem, extensao_imagem, imagem, principal} = request.body
 
     let pasta = imagem
 
@@ -79,7 +79,7 @@ route.put('/:id', async (request, response) => {
         })
     }
     
-    await mysql.queryAsync(`UPDATE imagens_itens_cardapios SET item_cardapio_id = ?, nome_imagem = ?, extensao_imagem = ?, imagem = ?, updated_at = ? WHERE id = ?`, [item_cardapio_id, nome_imagem, extensao_imagem, pasta, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
+    await mysql.queryAsync(`UPDATE imagens_itens_cardapios SET item_cardapio_id = ?, nome_imagem = ?, extensao_imagem = ?, imagem = ?, principal = ?, updated_at = ? WHERE id = ?`, [item_cardapio_id, nome_imagem, extensao_imagem, pasta, principal, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
     
     return response.status(200).json({
         data: parseInt(request.params.id)
