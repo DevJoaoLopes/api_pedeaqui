@@ -17,9 +17,22 @@ route.get('/:estabelecimento_id', async (request, response) => {
 
     let itens_cardapios = await mysql.queryAsync(`SELECT i.* FROM itens_cardapios AS i WHERE i.deleted_at IS NULL AND i.estabelecimento_id = ?`, [request.params.estabelecimento_id])
     let imagens_itens_cardapios = await mysql.queryAsync(`SELECT i.* FROM imagens_itens_cardapios AS i WHERE i.deleted_at IS NULL`)
+    let promocoes_itens_cardapios = await mysql.queryAsync(`
+        SELECT p.* FROM promocoes AS p
+        WHERE p.deleted_at IS NULL AND inicio <= ? AND termino >= ? AND ativo = 1 AND
+        p.quantidade > (
+            SELECT COUNT(i.id) AS utilizado FROM itens_pedidos AS i
+            WHERE i.deleted_at IS NULL AND i.promocao_id = p.id
+        )
+    `, [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')])
 
     itens_cardapios.map((i) => {
         i.imagens = imagens_itens_cardapios.filter(imagem => imagem.item_cardapio_id === i.id)
+        return null
+    })
+    
+    itens_cardapios.map((i) => {
+        i.promocoes = promocoes_itens_cardapios.filter(promocao => promocao.item_cardapio_id === i.id)
         return null
     })
     
@@ -31,7 +44,7 @@ route.get('/:estabelecimento_id', async (request, response) => {
 
 route.get('/detalhe/:id', async (request, response) => {
 
-    let item_cardapio = (await mysql.queryAsync(`SELECT i.* FROM itens_cardapios AS i WHERE i.deleted_at IS NULL AND i.id = ?`, [request.params.id]))[0]
+    let item_cardapio = (await mysql.queryAsync(`SELECT i.* FROM itens_cardapios AS i WHERE i.deleted_at IS NULL AND i.id = ?`, [request.params.id]))[0]  
     let imagens_item_cardapio = await mysql.queryAsync(`SELECT i.* FROM imagens_itens_cardapios AS i WHERE i.deleted_at IS NULL AND i.item_cardapio_id = ?`, [item_cardapio.id])
     let acompanhamentos_item_cardapio = await mysql.queryAsync(`
         SELECT a.*, ai.valor FROM acompanhamentos_has_itens_cardapios AS ai 
@@ -43,10 +56,19 @@ route.get('/detalhe/:id', async (request, response) => {
         INNER JOIN adicionais_itens AS a ON a.id = ai.adicional_id
         WHERE ai.deleted_at IS NULL AND a.deleted_at IS NULL AND ai.item_cardapio_id = ?
     `, [item_cardapio.id])
+    let promocoes_item_cardapio = await mysql.queryAsync(`
+        SELECT p.* FROM promocoes AS p
+        WHERE p.deleted_at IS NULL AND inicio <= ? AND termino >= ? AND ativo = 1 AND p.item_cardapio_id = ? AND
+        p.quantidade > (
+            SELECT COUNT(i.id) AS utilizado FROM itens_pedidos AS i
+            WHERE i.deleted_at IS NULL AND i.promocao_id = p.id
+        )
+    `, [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD'), item_cardapio.id])
 
     item_cardapio.imagens = imagens_item_cardapio
     item_cardapio.acompanhamentos = acompanhamentos_item_cardapio
     item_cardapio.adicionais = adicionais_item_cardapio
+    item_cardapio.promocoes = promocoes_item_cardapio
     
     return response.status(200).json({
         data: item_cardapio
