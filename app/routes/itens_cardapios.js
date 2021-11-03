@@ -47,12 +47,12 @@ route.get('/detalhe/:id', async (request, response) => {
     let item_cardapio = (await mysql.queryAsync(`SELECT i.* FROM itens_cardapios AS i WHERE i.deleted_at IS NULL AND i.id = ?`, [request.params.id]))[0]  
     let imagens_item_cardapio = await mysql.queryAsync(`SELECT i.* FROM imagens_itens_cardapios AS i WHERE i.deleted_at IS NULL AND i.item_cardapio_id = ?`, [item_cardapio.id])
     let acompanhamentos_item_cardapio = await mysql.queryAsync(`
-        SELECT a.*, ai.valor FROM acompanhamentos_has_itens_cardapios AS ai 
+        SELECT a.*, ai.id AS acompanhamento_has_item_cardapio_id, ai.valor FROM acompanhamentos_has_itens_cardapios AS ai 
         INNER JOIN acompanhamentos AS a ON a.id = ai.acompanhamento_id
         WHERE ai.deleted_at IS NULL AND a.deleted_at IS NULL AND ai.item_cardapio_id = ?
     `, [item_cardapio.id])
     let adicionais_item_cardapio = await mysql.queryAsync(`
-        SELECT a.*, ai.valor FROM adicionais_has_itens_cardapios AS ai 
+        SELECT a.*, ai.id AS adicional_has_item_cardapio_id, ai.valor FROM adicionais_has_itens_cardapios AS ai 
         INNER JOIN adicionais_itens AS a ON a.id = ai.adicional_id
         WHERE ai.deleted_at IS NULL AND a.deleted_at IS NULL AND ai.item_cardapio_id = ?
     `, [item_cardapio.id])

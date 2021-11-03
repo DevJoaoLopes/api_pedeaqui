@@ -15,9 +15,9 @@ route.get('/', async (request, response) => {
 
 route.post('/', async (request, response) => {
 
-    const {item_pedido_id, adicional_has_item_cardapio_id} = request.body
+    const {item_pedido_id, adicional_has_item_cardapio_id, valor} = request.body
 
-    let registro = await mysql.queryAsync(`INSERT INTO itens_pedidos_has_adicionais (item_pedido_id, adicional_has_item_cardapio_id, created_at) VALUES (?, ?, ?)`, [item_pedido_id, adicional_has_item_cardapio_id, moment().format('YYYY-MM-DD HH:mm:ss')])
+    let registro = await mysql.queryAsync(`INSERT INTO itens_pedidos_has_adicionais (item_pedido_id, adicional_has_item_cardapio_id, valor, created_at) VALUES (?, ?, ?, ?)`, [item_pedido_id, adicional_has_item_cardapio_id, valor, moment().format('YYYY-MM-DD HH:mm:ss')])
     
     return response.status(201).json({
         data: registro.insertId
@@ -27,9 +27,9 @@ route.post('/', async (request, response) => {
 
 route.put('/:id', async (request, response) => {
 
-    const {item_pedido_id, adicional_has_item_cardapio_id} = request.body
+    const {item_pedido_id, adicional_has_item_cardapio_id, valor} = request.body
 
-    await mysql.queryAsync(`UPDATE itens_pedidos_has_adicionais SET item_pedido_id = ?, adicional_has_item_cardapio_id = ?, updated_at = ? WHERE id = ?`, [item_pedido_id, adicional_has_item_cardapio_id, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
+    await mysql.queryAsync(`UPDATE itens_pedidos_has_adicionais SET item_pedido_id = ?, adicional_has_item_cardapio_id = ?, valor = ?, updated_at = ? WHERE id = ?`, [item_pedido_id, adicional_has_item_cardapio_id, valor, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
     
     return response.status(200).json({
         data: parseInt(request.params.id)
