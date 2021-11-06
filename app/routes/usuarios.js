@@ -19,6 +19,16 @@ route.get('/', async (request, response) => {
 
 })
 
+route.get('/:id', async (request, response) => {
+
+    let usuario = await mysql.queryAsync(`SELECT u.* FROM usuarios AS u WHERE u.deleted_at IS NULL AND u.id = ?`, [request.params.id])
+    
+    return response.status(200).json({
+        data: usuario
+    })
+
+})
+
 route.post('/', async (request, response) => {
 
     const {estabelecimento_id, cliente_id, estabelecimento_email_id, cliente_email_id, usuario, senha} = request.body
