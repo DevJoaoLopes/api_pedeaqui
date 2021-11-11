@@ -56,6 +56,20 @@ route.get('/detalhe/:id', async (request, response) => {
         INNER JOIN adicionais_itens AS a ON a.id = ai.adicional_id
         WHERE ai.deleted_at IS NULL AND a.deleted_at IS NULL AND ai.item_cardapio_id = ?
     `, [item_cardapio.id])
+    let escolhas_item_cardapio = await mysql.queryAsync(`
+        SELECT e.*, ei.id AS escolha_has_item_cardapio_id FROM escolhas_has_itens_cardapios AS ei 
+        INNER JOIN escolhas AS e ON e.id = ei.escolha_id
+        WHERE ei.deleted_at IS NULL AND e.deleted_at IS NULL AND ei.item_cardapio_id = ?
+    `, [item_cardapio.id])
+    if(escolhas_item_cardapio.length > 0){
+        let escolhas_opcoes = await mysql.queryAsync(`
+            SELECT eo.* FROM escolhas_opcoes AS eo 
+            WHERE eo.deleted_at IS NULL AND eo.escolha_id IN (?)
+        `, [escolhas_item_cardapio.map(e => e.id)])
+        escolhas_item_cardapio.map(e => {
+            e.opcoes = escolhas_opcoes.filter(eo => eo.escolha_id === e.id)
+        })
+    }
     let promocoes_item_cardapio = await mysql.queryAsync(`
         SELECT p.* FROM promocoes AS p
         WHERE p.deleted_at IS NULL AND inicio <= ? AND termino >= ? AND ativo = 1 AND p.item_cardapio_id = ? AND
@@ -68,6 +82,7 @@ route.get('/detalhe/:id', async (request, response) => {
     item_cardapio.imagens = imagens_item_cardapio
     item_cardapio.acompanhamentos = acompanhamentos_item_cardapio
     item_cardapio.adicionais = adicionais_item_cardapio
+    item_cardapio.escolhas = escolhas_item_cardapio
     item_cardapio.promocoes = promocoes_item_cardapio
     
     return response.status(200).json({

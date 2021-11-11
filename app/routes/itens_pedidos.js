@@ -36,27 +36,36 @@ route.get('/:pedido_id', async (request, response) => {
             SELECT ia.*, a.acompanhamento, a.obrigatorio FROM itens_pedidos_has_acompanhamentos AS ia
             INNER JOIN acompanhamentos_has_itens_cardapios AS ai ON ai.id = ia.acompanhamento_has_item_cardapio_id
             INNER JOIN acompanhamentos AS a ON a.id = ai.acompanhamento_id
-            WHERE ia.item_pedido_id IN (?)
+            WHERE ia.item_pedido_id IN (?) AND ia.deleted_at IS NULL
         `, [itens_pedidos.map(i => i.id)])
         
         let adicionais = await mysql.queryAsync(`
             SELECT ia.*, a.adicional FROM itens_pedidos_has_adicionais AS ia
             INNER JOIN adicionais_has_itens_cardapios AS ai ON ai.id = ia.adicional_has_item_cardapio_id
             INNER JOIN adicionais_itens AS a ON a.id = ai.adicional_id
-            WHERE ia.item_pedido_id IN (?)
+            WHERE ia.item_pedido_id IN (?) AND ia.deleted_at IS NULL
+        `, [itens_pedidos.map(i => i.id)])
+        
+        let escolhas = await mysql.queryAsync(`
+            SELECT ie.*, e.escolha, eo.opcao FROM itens_pedidos_has_escolhas AS ie
+            INNER JOIN escolhas_has_itens_cardapios AS ei ON ei.id = ie.escolha_has_item_cardapio_id
+            INNER JOIN escolhas AS e ON e.id = ei.escolha_id
+            INNER JOIN escolhas_opcoes AS eo ON eo.id = ie.escolha_opcao_id
+            WHERE ie.item_pedido_id IN (?) AND ie.deleted_at IS NULL
         `, [itens_pedidos.map(i => i.id)])
         
         let imagens = await mysql.queryAsync(`
             SELECT iic.*, ip.id AS item_pedido_id FROM imagens_itens_cardapios AS iic
             INNER JOIN itens_cardapios AS ic ON ic.id = iic.item_cardapio_id
             INNER JOIN itens_pedidos AS ip ON ip.item_cardapio_id = iic.id
-            WHERE ip.id IN (?)
+            WHERE ip.id IN (?) AND iic.deleted_at IS NULL
         `, [itens_pedidos.map(i => i.id)])
     
         itens_pedidos.map((i) => {
             i.promocao = promocoes.find(p => p.id === i.promocao_id)
             i.acompanhamentos = acompanhamentos.filter(a => a.item_pedido_id === i.id)
             i.adicionais = adicionais.filter(a => a.item_pedido_id === i.id)
+            i.escolhas = escolhas.filter(e => e.item_pedido_id === i.id)
             i.imagens = imagens.filter(i => i.item_pedido_id === i.id)
     
             return null
@@ -116,20 +125,29 @@ route.get('/estabelecimentos/cozinha/:estabelecimento_id', async (request, respo
             SELECT ia.*, a.acompanhamento, a.obrigatorio FROM itens_pedidos_has_acompanhamentos AS ia
             INNER JOIN acompanhamentos_has_itens_cardapios AS ai ON ai.id = ia.acompanhamento_has_item_cardapio_id
             INNER JOIN acompanhamentos AS a ON a.id = ai.acompanhamento_id
-            WHERE ia.item_pedido_id IN (?)
+            WHERE ia.item_pedido_id IN (?) AND ia.deleted_at IS NULL
         `, [itens_pedidos.map(i => i.id)])
         
         let adicionais = await mysql.queryAsync(`
             SELECT ia.*, a.adicional FROM itens_pedidos_has_adicionais AS ia
             INNER JOIN adicionais_has_itens_cardapios AS ai ON ai.id = ia.adicional_has_item_cardapio_id
             INNER JOIN adicionais_itens AS a ON a.id = ai.adicional_id
-            WHERE ia.item_pedido_id IN (?)
+            WHERE ia.item_pedido_id IN (?) AND ia.deleted_at IS NULL
+        `, [itens_pedidos.map(i => i.id)])
+
+        let escolhas = await mysql.queryAsync(`
+            SELECT ie.*, e.escolha, eo.opcao FROM itens_pedidos_has_escolhas AS ie
+            INNER JOIN escolhas_has_itens_cardapios AS ei ON ei.id = ie.escolha_has_item_cardapio_id
+            INNER JOIN escolhas AS e ON e.id = ei.escolha_id
+            INNER JOIN escolhas_opcoes AS eo ON eo.id = ie.escolha_opcao_id
+            WHERE ie.item_pedido_id IN (?) AND ie.deleted_at IS NULL
         `, [itens_pedidos.map(i => i.id)])
         
         itens_pedidos.map((i) => {
             i.promocao = promocoes.find(p => p.id === i.promocao_id)
             i.acompanhamentos = acompanhamentos.filter(a => a.item_pedido_id === i.id)
             i.adicionais = adicionais.filter(a => a.item_pedido_id === i.id)
+            i.escolhas = escolhas.filter(e => e.item_pedido_id === i.id)
     
             return null
         })
@@ -143,7 +161,7 @@ route.get('/estabelecimentos/cozinha/:estabelecimento_id', async (request, respo
 
 route.post('/', async (request, response) => {
 
-    const {indice, item_cardapio_id, pedido_has_usuario_id, status_pedido_id, promocao_id, observacao, adicionais, acompanhamentos, adicionais_obrigatorios, acompanhamentos_obrigatorios} = request.body
+    const {indice, item_cardapio_id, pedido_has_usuario_id, status_pedido_id, promocao_id, observacao, adicionais, acompanhamentos, adicionais_obrigatorios, acompanhamentos_obrigatorios, escolhas} = request.body
  
     let item_pedido = await mysql.queryAsync(`INSERT INTO itens_pedidos (item_cardapio_id, pedido_has_usuario_id, status_pedido_id, promocao_id, observacao, created_at) VALUES (?, ?, ?, ?, ?, ?)`, [item_cardapio_id, pedido_has_usuario_id, status_pedido_id, promocao_id, observacao, moment().format('YYYY-MM-DD HH:mm:ss')])
     
@@ -161,6 +179,10 @@ route.post('/', async (request, response) => {
     
     acompanhamentos_obrigatorios.map(async (a) => {
         await mysql.queryAsync(`INSERT INTO itens_pedidos_has_acompanhamentos (item_pedido_id, acompanhamento_has_item_cardapio_id, valor, created_at) VALUES (?, ?, ?, ?)`, [item_pedido.insertId, a.acompanhamento_has_item_cardapio_id, a.valor, moment().format('YYYY-MM-DD HH:mm:ss')])
+    })
+    
+    escolhas.map(async (e) => {
+        await mysql.queryAsync(`INSERT INTO itens_pedidos_has_escolhas (item_pedido_id, escolha_has_item_cardapio_id, escolha_opcao_id, created_at) VALUES (?, ?, ?, ?)`, [item_pedido.insertId, e.escolha.escolha_has_item_cardapio_id, e.opcao.id, moment().format('YYYY-MM-DD HH:mm:ss')])
     })
 
     return response.status(201).json({
