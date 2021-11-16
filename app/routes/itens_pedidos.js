@@ -203,6 +203,18 @@ route.put('/:id', async (request, response) => {
     
 })
 
+route.put('/status_pedido/:id', async (request, response) => {
+
+    const {status_pedido_id} = request.body
+    
+    await mysql.queryAsync(`UPDATE itens_pedidos SET status_pedido_id = ?, updated_at = ? WHERE id = ?`, [status_pedido_id, moment().format('YYYY-MM-DD HH:mm:ss'), request.params.id])
+    
+    return response.status(200).json({
+        data: parseInt(request.params.id)
+    })
+    
+})
+
 route.delete('/:id', async (request, response) => {
 
     let pedido_has_usuario = await mysql.queryAsync(`
