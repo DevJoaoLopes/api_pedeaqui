@@ -46,9 +46,10 @@ route.post('/cadastrar_se', async (request, response) => {
     let cliente = await mysql.queryAsync(`INSERT INTO clientes (nome, created_at) VALUES (?, ?)`, [nome, moment().format('YYYY-MM-DD HH:mm:ss')])
     let email_cliente = await mysql.queryAsync(`INSERT INTO emails (email, created_at) VALUES (?, ?)`, [email, moment().format('YYYY-MM-DD HH:mm:ss')])
     let cliente_has_email = await mysql.queryAsync(`INSERT INTO clientes_has_emails (cliente_id, email_id) VALUES (?, ?)`, [cliente.insertId, email_cliente.insertId])
-
-    await mysql.queryAsync(`INSERT INTO usuarios (estabelecimento_id, cliente_id, estabelecimento_email_id, cliente_email_id, usuario, senha, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`, [null, cliente.insertId, null, cliente_has_email.insertId, usuario, senha, moment().format('YYYY-MM-DD HH:mm:ss')])
+    let usuario_cliente = await mysql.queryAsync(`INSERT INTO usuarios (estabelecimento_id, cliente_id, estabelecimento_email_id, cliente_email_id, usuario, senha, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`, [null, cliente.insertId, null, cliente_has_email.insertId, usuario, senha, moment().format('YYYY-MM-DD HH:mm:ss')])
+    await mysql.queryAsync(`INSERT INTO usuarios_has_permissoes (usuario_id, permissao_id, created_at) VALUES (?, ?, ?)`, [usuario_cliente.insertId, 1, moment().format('YYYY-MM-DD HH:mm:ss')])
     
+
     return response.status(201).json({
         data: cliente.insertId
     })
