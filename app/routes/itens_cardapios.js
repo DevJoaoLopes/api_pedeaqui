@@ -16,25 +16,72 @@ route.get('/', async (request, response) => {
 route.get('/:estabelecimento_id', async (request, response) => {
 
     let itens_cardapios = await mysql.queryAsync(`SELECT i.* FROM itens_cardapios AS i WHERE i.deleted_at IS NULL AND i.estabelecimento_id = ?`, [request.params.estabelecimento_id])
-    let imagens_itens_cardapios = await mysql.queryAsync(`SELECT i.* FROM imagens_itens_cardapios AS i WHERE i.deleted_at IS NULL`)
+    let imagens_itens_cardapios = await mysql.queryAsync(`
+        SELECT i.* FROM imagens_itens_cardapios AS i WHERE i.deleted_at IS NULL AND i.item_cardapio_id IN (?)
+    `, [itens_cardapios.map(i => i.id)])
     let promocoes_itens_cardapios = await mysql.queryAsync(`
         SELECT p.* FROM promocoes AS p
         WHERE p.deleted_at IS NULL AND inicio <= ? AND termino >= ? AND ativo = 1 AND
         p.quantidade > (
             SELECT COUNT(i.id) AS utilizado FROM itens_pedidos AS i
             WHERE i.deleted_at IS NULL AND i.promocao_id = p.id
-        )
-    `, [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')])
+        ) AND p.item_cardapio_id IN (?)
+    `, [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD'), itens_cardapios.map(i => i.id)])
 
     itens_cardapios.map((i) => {
         i.imagens = imagens_itens_cardapios.filter(imagem => imagem.item_cardapio_id === i.id)
-        return null
-    })
-    
-    itens_cardapios.map((i) => {
         i.promocoes = promocoes_itens_cardapios.filter(promocao => promocao.item_cardapio_id === i.id)
         return null
     })
+
+    return response.status(200).json({
+        data: itens_cardapios
+    })
+
+})
+
+route.get('/area_administrativa/:estabelecimento_id', async (request, response) => {
+
+    let itens_cardapios = await mysql.queryAsync(`SELECT i.* FROM itens_cardapios AS i WHERE i.estabelecimento_id = ?`, [request.params.estabelecimento_id])
+    
+    if(itens_cardapios.length > 0){
+            
+        let promocoes = await mysql.queryAsync(`
+            SELECT p.* FROM promocoes AS p
+            WHERE p.deleted_at IS NULL AND inicio <= ? AND termino >= ? AND ativo = 1 AND
+            p.quantidade > (
+                SELECT COUNT(i.id) AS utilizado FROM itens_pedidos AS i
+                WHERE i.deleted_at IS NULL AND i.promocao_id = p.id
+            ) AND p.item_cardapio_id IN (?)
+            GROUP BY p.id
+        `, [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD'), itens_cardapios.map(i => i.id)])
+
+        let acompanhamentos = await mysql.queryAsync(`
+            SELECT ai.*, a.acompanhamento, a.obrigatorio FROM acompanhamentos_has_itens_cardapios AS ai
+            INNER JOIN acompanhamentos AS a ON a.id = ai.acompanhamento_id
+            WHERE ai.item_cardapio_id IN (?) AND ai.deleted_at IS NULL
+        `, [itens_cardapios.map(i => i.id)])
+            
+        let adicionais = await mysql.queryAsync(`
+            SELECT ai.*, a.adicional FROM adicionais_has_itens_cardapios AS ai
+            INNER JOIN adicionais_itens AS a ON a.id = ai.adicional_id
+            WHERE ai.item_cardapio_id IN (?) AND ai.deleted_at IS NULL
+        `, [itens_cardapios.map(i => i.id)])
+            
+        let escolhas = await mysql.queryAsync(`
+            SELECT ei.*, e.escolha FROM escolhas_has_itens_cardapios AS ei
+            INNER JOIN escolhas AS e ON e.id = ei.escolha_id
+            WHERE ei.item_cardapio_id IN (?) AND ei.deleted_at IS NULL
+        `, [itens_cardapios.map(i => i.id)])
+    
+        itens_cardapios.map((i) => {
+            i.promocoes = promocoes.filter(promocao => promocao.item_cardapio_id === i.id)
+            i.acompanhamentos = acompanhamentos.filter(acompanhamento => acompanhamento.item_cardapio_id === i.id)
+            i.adicionais = adicionais.filter(adicional => adicional.item_cardapio_id === i.id)
+            i.escolhas = escolhas.filter(escolha => escolha.item_cardapio_id === i.id)
+            return null
+        })
+    }
     
     return response.status(200).json({
         data: itens_cardapios
